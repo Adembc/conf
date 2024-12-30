@@ -44,6 +44,20 @@ func newSourceEnv(namespace string) *env {
 		uspace = uspace[1:]
 	}
 
+	// Read the .env file if it exists.
+	envMap := make(map[string]string)
+	if file, err := os.ReadFile(".env"); err == nil {
+		ParseBytes(file, envMap)
+	}
+
+	for key, value := range envMap {
+		if !strings.HasPrefix(key, uspace) {
+			continue
+		}
+
+		m[strings.ToUpper(strings.TrimPrefix(key, uspace))] = value
+	}
+
 	// Loop and match each variable using the uppercase namespace.
 	for _, val := range os.Environ() {
 		if !strings.HasPrefix(val, uspace) {
